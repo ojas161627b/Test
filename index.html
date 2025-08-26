@@ -12,17 +12,14 @@
       padding: 20px;
       margin: 0;
     }
-
     h1 {
       text-align: center;
       margin-bottom: 20px;
     }
-
     #quests {
       max-width: 500px;
       margin: 0 auto;
     }
-
     .quest {
       background: #1e293b;
       padding: 15px;
@@ -33,21 +30,17 @@
       align-items: center;
       transition: transform 0.2s;
     }
-
     .quest:hover {
       transform: scale(1.02);
     }
-
     .quest strong {
       font-size: 16px;
       display: block;
     }
-
     .quest small {
       color: #94a3b8;
       font-size: 13px;
     }
-
     .badge {
       background: #22c55e;
       padding: 5px 12px;
@@ -55,7 +48,6 @@
       font-weight: bold;
       font-size: 14px;
     }
-
     a {
       text-decoration: none;
       color: inherit;
@@ -67,11 +59,16 @@
   <div id="quests">Loading quests...</div>
 
   <script>
-    // Replace with your PubID
-    const pubid = "403848"; // example, change to your real PubID
-    const apikey = "34367|m6htOLnBCRuJTgAx5FCmfxQkegPuGNsYpxAcseFE8b1f2642";
+    const pubid = "34367";
+    const apikey = "m6htOLnBCRuJTgAx5FCmfxQkegPuGNsYpxAcseFE8b1f2642";
 
-    fetch(`https://unlockcontent.net/api/v2?pubid=${pubid}&key=${apikey}&country=US`)
+    // Detect user country with free IP API
+    fetch("https://ipapi.co/json/")
+      .then(res => res.json())
+      .then(loc => {
+        const country = loc.country || "US"; // fallback if detection fails
+        return fetch(`https://unlockcontent.net/api/v2?pubid=${pubid}&key=${apikey}&country=${country}`);
+      })
       .then(res => res.json())
       .then(data => {
         let html = "";
