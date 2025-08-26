@@ -8,7 +8,7 @@
     body {
       font-family: Arial, sans-serif;
       background: #0f172a;
-      color: #fff;
+      color: white;
       padding: 20px;
       margin: 0;
     }
@@ -16,84 +16,80 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    #quests {
-      max-width: 500px;
-      margin: 0 auto;
+    #offers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
     }
-    .quest {
+    .offer {
       background: #1e293b;
       padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 10px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      align-items: center;
-      transition: transform 0.2s;
     }
-    .quest:hover {
-      transform: scale(1.02);
+    .offer h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #f8fafc;
     }
-    .quest strong {
-      font-size: 16px;
-      display: block;
-    }
-    .quest small {
-      color: #94a3b8;
-      font-size: 13px;
-    }
-    .badge {
-      background: #22c55e;
-      padding: 5px 12px;
-      border-radius: 8px;
-      font-weight: bold;
+    .offer p {
+      margin: 0 0 15px;
       font-size: 14px;
+      color: #cbd5e1;
     }
-    a {
+    .offer a {
+      text-align: center;
+      background: #2563eb;
+      color: white;
+      padding: 10px;
       text-decoration: none;
-      color: inherit;
+      border-radius: 8px;
+      transition: background 0.3s;
+      font-weight: bold;
+    }
+    .offer a:hover {
+      background: #1d4ed8;
     }
   </style>
 </head>
 <body>
-  <h1>⚡ Complete Quests</h1>
-  <div id="quests">Loading quests...</div>
+
+  <h1>⚔️ Choose Your Quest</h1>
+  <div id="offers">Loading quests...</div>
 
   <script>
-    const pubid = "34367";
-    const apikey = "m6htOLnBCRuJTgAx5FCmfxQkegPuGNsYpxAcseFE8b1f2642";
+    async function loadOffers() {
+      try {
+        let res = await fetch("https://www.cpagrip.com/common/offer_feed_json.php?user_id=2075196&pubkey=5ad9b8aedbc0d0984e26bb42ee0e12d2&tracking_id=");
+        let data = await res.json();
 
-    // Detect user country with free IP API
-    fetch("https://ipapi.co/json/")
-      .then(res => res.json())
-      .then(loc => {
-        const country = loc.country || "US"; // fallback if detection fails
-        return fetch(`https://unlockcontent.net/api/v2?pubid=${pubid}&key=${apikey}&country=${country}`);
-      })
-      .then(res => res.json())
-      .then(data => {
-        let html = "";
-        if (data.offers && data.offers.length > 0) {
-          data.offers.forEach(offer => {
-            html += `
-              <a href="${offer.click_url}" target="_blank">
-                <div class="quest">
-                  <div>
-                    <strong>${offer.name}</strong>
-                    <small>${offer.description || ''}</small>
-                  </div>
-                  <span class="badge">Quest</span>
-                </div>
-              </a>`;
+        let container = document.getElementById("offers");
+        container.innerHTML = "";
+
+        if (data && data.length > 0) {
+          data.forEach(offer => {
+            let div = document.createElement("div");
+            div.className = "offer";
+            div.innerHTML = `
+              <h2>${offer.name}</h2>
+              <p>${offer.description || "Complete this quest to continue."}</p>
+              <a href="${offer.offerlink}" target="_blank">Start Quest</a>
+            `;
+            container.appendChild(div);
           });
         } else {
-          html = "<p>No quests available right now. Try again later!</p>";
+          container.innerHTML = "⚠️ No quests available right now.";
         }
-        document.getElementById("quests").innerHTML = html;
-      })
-      .catch(err => {
-        document.getElementById("quests").innerHTML = "⚠️ Error loading quests.";
-        console.error(err);
-      });
+      } catch (e) {
+        document.getElementById("offers").innerHTML = "❌ Failed to load quests.";
+      }
+    }
+
+    loadOffers();
   </script>
+
 </body>
 </html>
